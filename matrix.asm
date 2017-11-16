@@ -5,6 +5,8 @@ enableArray: .space 80 #track which columns are to be updates
 currentRow: .space 80 #track current start of digtial rain for a column
 updateQueue: .space 40 #queue to manage columns to send
 
+#Output Strings
+userPrompt: .asciiz "Please enter a number from 1 to 40: "
 
 #Useful macros
 
@@ -14,7 +16,7 @@ updateQueue: .space 40 #queue to manage columns to send
 .eqv RANDOM_ID 1
 
 .text 
-#set Random id and Seed
+#set random id and Seed
 #grab time
 addi $v0, $zero, 30
 syscall
@@ -22,7 +24,37 @@ add $a1, $zero, $a0 #set low order half of time to be seed
 addi $a0, $zero, RANDOM_ID
 addi $v0, $zero, 40 
 syscall
+#Prompt User for input
+#actually implement this 
+addi $v0, $zero, 2 #dummy input; DO NOT LEAVE THIS IN
+
+add $t0, $zero, $v0 #moves user input into t0 for intial column selection
+#Select inital columns to be selected 
+#set random id and random with range syscall
+initialColumnSelectLoop:
+beqz $t0, rainLoop # once zero, branch out
+#set random id and random with range syscall
+addi $v0, $zero, 42
+addi $a0, $zero, RANDOM_ID
+addi $a1, $zero, 80 #intial range is 0-80
+syscall
+lb $t1, enableArray($a0) #Use returned value as offset to load byte
+bnez $t1, collisionResolution
+add $t2, $zero, $a0 # $t2 = index to enabled array
+addi $a1, $zero, 255 # range is now 0-255
+syscall
+addi $a0, $a0, 1 #adds 1 to result so range is effectively 1-255, inclusive
+sb $a0, enableArray($t2) # stores value from above into enabled
+addi $t0, $t0, -1 #decrement column needed index
+j initialColumnSelectLoop
+rainLoop:
 
 #Terminate Program
 addi $v0, $zero, 10
 syscall
+
+#Functions
+# $a0 = column index 
+# #v0 = next availible column index
+collisionResolution:
+
