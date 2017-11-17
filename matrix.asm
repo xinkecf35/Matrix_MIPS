@@ -26,7 +26,7 @@ addi $v0, $zero, 40
 syscall
 #Prompt User for input
 #actually implement this 
-addi $v0, $zero, 2 #dummy input; DO NOT LEAVE THIS IN
+addi $v0, $zero, 10 #dummy input; DO NOT LEAVE THIS IN
 
 add $t0, $zero, $v0 #moves user input into t0 for intial column selection
 #Select inital columns to be selected 
@@ -39,14 +39,28 @@ addi $a0, $zero, RANDOM_ID
 addi $a1, $zero, 80 #intial range is 0-80
 syscall
 lb $t1, enableArray($a0) #Use returned value as offset to load byte
-bnez $t1, collisionResolution
+beqz $t1, noCollision
+#Perserving registers
+addi $sp, $sp, -8
+sw $t1, 4($sp)
+sw $t0, 0($sp)
+jal collisionResolution #argument for column index is already in a0
+add $a0, $zero, $v0 #setting a0 to returned value to keep consistent
+#Restoring registers
+lw $t0, 0($sp)
+lw $t1, 4($sp)
+addi $sp, $sp, 8
+noCollision: 
 add $t2, $zero, $a0 # $t2 = index to enabled array
+#Call random with range from 0 to 255
+addi $a0, $zero, RANDOM_ID
 addi $a1, $zero, 255 # range is now 0-255
 syscall
 addi $a0, $a0, 1 #adds 1 to result so range is effectively 1-255, inclusive
 sb $a0, enableArray($t2) # stores value from above into enabled
 addi $t0, $t0, -1 #decrement column needed index
 j initialColumnSelectLoop
+
 rainLoop:
 
 #Terminate Program
@@ -58,3 +72,4 @@ syscall
 # #v0 = next availible column index
 collisionResolution:
 
+jr $ra
