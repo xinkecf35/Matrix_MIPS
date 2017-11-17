@@ -32,7 +32,7 @@ add $t0, $zero, $v0 #moves user input into t0 for intial column selection
 #Select inital columns to be selected 
 #set random id and random with range syscall
 initialColumnSelectLoop:
-beqz $t0, rainLoop # once zero, branch out
+beqz $t0, startDigitalRain # once zero, branch out
 #set random id and random with range syscall
 addi $v0, $zero, 42
 addi $a0, $zero, RANDOM_ID
@@ -62,7 +62,12 @@ sb $a0, enableArray($t2) # stores value from above into enabled
 addi $t0, $t0, -1 #decrement column needed index
 j initialColumnSelectLoop
 
+startDigitalRain:
+addi $s0, $zero, 1 #Using $s0 as global cycle count, start at 1
 rainLoop:
+add $a0, $zero, $s0
+jal identifyColumnsToRefresh
+add $t0, $zero, $zero
 
 #Terminate Program
 addi $v0, $zero, 10
@@ -84,3 +89,28 @@ and $v0, $v0, $zero
 j findOpenIndexLoop
 returnEmptyIndex: 
 jr $ra
+
+# $a0 = current global cycle count
+# $v0 = number of items currently in the queue
+identifyColumnsToRefresh:
+and $t0, $zero, $t0 # index of enableArray
+and $t1, $zero, $t1 # index of updateQueue
+enqueueColumnsLoop:
+beq $t0, 40, returnQueueSize
+lb $t3, enableArray($t0)
+beqz $t3, incrementQueueLoop
+#if value is non-zero, determine whether to enqueue or not
+divu $t3, $a0 
+mfhi $t4
+bnez $t4, incrementQueueLoop # if remainder is not zero, do not enqueue
+sb $t0, updateQueue($t1) # enqueue index of enableArray onto queue
+addi $t1, $t1, 1 # increase updateQueue index
+incrementQueueLoop:
+addi $t0, $t0, 1 #increase enableArray queue
+j enqueueColumnsLoop
+
+returnQueueSize:
+add $v0, $zero, $t1
+jr $ra
+
+
