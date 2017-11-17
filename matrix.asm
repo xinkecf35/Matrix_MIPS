@@ -67,13 +67,53 @@ addi $s0, $zero, 1 #Using $s0 as global cycle count, start at 1
 rainLoop:
 add $a0, $zero, $s0
 jal identifyColumnsToRefresh
-add $t0, $zero, $zero
+add $s1, $zero, $v0 #number of items in updateQueue
+and $s0, $zero, $s0 #set index 
+refreshColumnsLoop:
+lb $a0, updateQueue($s0) #dequeue a columm from updateQueue
+lb $a1, currentRow($a0) #get row from currentRow for column
+jal updateColumn
 
 #Terminate Program
 addi $v0, $zero, 10
 syscall
 
 #Functions
+#Function to refresh individual columns
+# $a0 = column index
+# $a0 = current row for column
+updateColumn:
+add $t0, $zero, $a0 # $t0 = column
+add $t1, $zero, $a1 # $t1 = row
+addi $sp, $sp, -8
+#Perserving $t0 and $t1
+sw $t0, 4($sp)
+sw $t1, 0($sp)
+jal fetchColumnAddress
+
+
+jr $ra
+
+#Function to calculate memory address of terminal region 
+#for given column and row
+# $a0 = column
+# $a1 = row
+# #v0 = address of column and region
+fetchColumnAddress:
+add $v0, $zero, TERMINAL_REGION_START #Start of terminal memory region in $t0
+#Calculate offset to row
+addi $t0, $zero, COLUMN_OFFSET_MULTIPLIER # t1 = column constant; 4
+addi $t1, $zero, ROW_OFFSET_MULTIPLIER # $t0 = row calculation constant; 320
+multu $a0, $t0 #column index * column_multiplier
+mflo $t2 # t2 = calculated column offset
+multu $a1, $t1 # row index * row_multiplier
+mflo $t3 # t3 = calculated row offset
+#adding offset to final result
+add $v0, $v0, $t2
+add $v0, $v0, $t3
+jr $ra
+
+#Function to resolve collisions between random generated numbers
 # $a0 = column index 
 # #v0 = next availible column index
 collisionResolution:
@@ -90,6 +130,7 @@ j findOpenIndexLoop
 returnEmptyIndex: 
 jr $ra
 
+#Function to queue columns to refresh
 # $a0 = current global cycle count
 # $v0 = number of items currently in the queue
 identifyColumnsToRefresh:
@@ -111,6 +152,7 @@ j enqueueColumnsLoop
 
 returnQueueSize:
 add $v0, $zero, $t1
+#maybe need to add one here?
 jr $ra
 
 
