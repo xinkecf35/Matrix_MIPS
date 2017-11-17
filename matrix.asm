@@ -53,6 +53,7 @@ addi $sp, $sp, 8
 noCollision: 
 add $t2, $zero, $a0 # $t2 = index to enabled array
 #Call random with range from 0 to 255
+addi $v0, $zero, 42
 addi $a0, $zero, RANDOM_ID
 addi $a1, $zero, 255 # range is now 0-255
 syscall
@@ -71,5 +72,15 @@ syscall
 # $a0 = column index 
 # #v0 = next availible column index
 collisionResolution:
-
+addi $v0, $a0, 1
+findOpenIndexLoop:
+beq $v0, 80, setIndexToZero
+lb $t1, enableArray($v0)
+beqz $t1, returnEmptyIndex
+addi $v0, $v0, 1
+j findOpenIndexLoop
+setIndexToZero:
+and $v0, $v0, $zero 
+j findOpenIndexLoop
+returnEmptyIndex: 
 jr $ra
