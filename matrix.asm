@@ -11,7 +11,7 @@ userPrompt: .asciiz "Please enter a number from 1 to 40: "
 #Useful macros
 
 .eqv ROW_OFFSET_MULTIPLIER 320
-.eqv COLUMN_OFFSET_MULTPLIER 4
+.eqv COLUMN_OFFSET_MULTIPLIER 4
 .eqv TERMINAL_REGION_START 0xFFFF8000
 .eqv RANDOM_ID 1
 
@@ -85,13 +85,52 @@ syscall
 updateColumn:
 add $t0, $zero, $a0 # $t0 = column
 add $t1, $zero, $a1 # $t1 = row
-addi $sp, $sp, -8
+addi $t2, $zero, 250 #greenValue index
+rowLoop: 
+addi $sp, $sp, -12
 #Perserving $t0 and $t1
-sw $t0, 4($sp)
-sw $t1, 0($sp)
+sw $t2, 8($sp)
+sw $t1, 4($sp)
+sw $t0, 0($sp)
+add $a1, $zero, $t1
+add $a0, $zero, $t0
 jal fetchColumnAddress
+add $t3, $zero, $v0 #stores address from fetchColumnAddress
+#Restore Values
+lw $t2 8($sp)
+lw $t1 4($sp)
+lw $t0 0($sp)
+addi $sp, $sp, 12
+#perserve for next function call
+addi $sp, $sp, -16
+sw $t3, 12($sp)
+sw $t2, 8($sp)
+sw $t1, 4($sp)
+sw $t0, 0($sp)
+add $a0, $zero, $t2
+jal createWordForConsole
+lw $t3, 12($sp)
+lw $t2, 8($sp)
+lw $t1, 4($sp)
+lw $t0, 0($sp)
+addi $sp, $sp, 16
+sw $v0, 0($t3)
 
+jr $ra
 
+#Function to create word to load into array
+# $a0 = current Green Value
+createWordForConsole:
+add $t0, $zero, $a0 # t0 contains current green value
+#generates a random value now
+add $a0, $zero, RANDOM_ID
+add $a1, $zero, 94
+addi $v0, $zero, 42
+syscall
+addi $a0, $a0, 33 # a0 should be from 33 - 127
+sll $v0, $a0, 24 # v0 now contains character in right portion
+sll $t1, $t0, 8
+add $v0, $v0, $t1 # v0 should contain right word for address at terminal
 jr $ra
 
 #Function to calculate memory address of terminal region 
