@@ -81,11 +81,11 @@ syscall
 #Functions
 #Function to refresh individual columns
 # $a0 = column index
-# $a0 = current row for column
+# $a1 = current row for column
 updateColumn:
 add $t0, $zero, $a0 # $t0 = column
 add $t1, $zero, $a1 # $t1 = row
-addi $t2, $zero, 250 #greenValue index
+addi $t2, $zero, 0 #greenValue index
 rowLoop: 
 addi $sp, $sp, -16
 #Perserving $t0 and $t1
@@ -119,6 +119,8 @@ lw $t1, 4($sp)
 lw $t0, 0($sp)
 addi $sp, $sp, 20
 sw $v0, 0($t3)
+addi $t2, $t2, 10
+addi $t1, $t1, 1 
 
 jr $ra
 
