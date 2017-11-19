@@ -119,6 +119,8 @@ lw $t1, 4($sp)
 lw $t0, 0($sp)
 addi $sp, $sp, 20
 sw $v0, 0($t3)
+addi $t2, $t2, -10
+addi $t1, $t1, -1
 
 jr $ra
 
