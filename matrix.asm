@@ -87,12 +87,13 @@ add $t0, $zero, $a0 # $t0 = column
 add $t1, $zero, $a1 # $t1 = row
 addi $t2, $zero, 0 #greenValue index
 rowLoop: 
-addi $sp, $sp, -16
 #Perserving $t0 and $t1
+addi $sp, $sp, -16
 sw $ra, 12($sp)
 sw $t2, 8($sp)
 sw $t1, 4($sp)
 sw $t0, 0($sp)
+#set arguments for fetchColumnAddress
 add $a1, $zero, $t1
 add $a0, $zero, $t0
 jal fetchColumnAddress
@@ -110,6 +111,7 @@ sw $t3, 12($sp)
 sw $t2, 8($sp)
 sw $t1, 4($sp)
 sw $t0, 0($sp)
+#set arguments for createWordForConsole
 add $a0, $zero, $t2
 jal createWordForConsole
 lw $ra, 16($sp)
@@ -118,10 +120,13 @@ lw $t2, 8($sp)
 lw $t1, 4($sp)
 lw $t0, 0($sp)
 addi $sp, $sp, 20
-sw $v0, 0($t3)
+sw $v0, 0($t3) #stores word into address of terminal
+beq $t2, 250, exitUpdateColumn #if greenValue is 250, exit
+beq $t1, 39, exitUpdateColumn #if row reaches end, exit
 addi $t2, $t2, 10
 addi $t1, $t1, 1 
-
+j rowLoop
+exitUpdateColumn:
 jr $ra
 
 #Function to create word to load into array
