@@ -87,8 +87,9 @@ add $t0, $zero, $a0 # $t0 = column
 add $t1, $zero, $a1 # $t1 = row
 addi $t2, $zero, 250 #greenValue index
 rowLoop: 
-addi $sp, $sp, -12
+addi $sp, $sp, -16
 #Perserving $t0 and $t1
+sw $ra, 12($sp)
 sw $t2, 8($sp)
 sw $t1, 4($sp)
 sw $t0, 0($sp)
@@ -97,23 +98,26 @@ add $a0, $zero, $t0
 jal fetchColumnAddress
 add $t3, $zero, $v0 #stores address from fetchColumnAddress
 #Restore Values
+lw $ra 12($sp)
 lw $t2 8($sp)
 lw $t1 4($sp)
 lw $t0 0($sp)
-addi $sp, $sp, 12
+addi $sp, $sp, 16
 #perserve for next function call
-addi $sp, $sp, -16
+addi $sp, $sp, -20
+sw $ra, 16($sp)
 sw $t3, 12($sp)
 sw $t2, 8($sp)
 sw $t1, 4($sp)
 sw $t0, 0($sp)
 add $a0, $zero, $t2
 jal createWordForConsole
+lw $ra, 16($sp)
 lw $t3, 12($sp)
 lw $t2, 8($sp)
 lw $t1, 4($sp)
 lw $t0, 0($sp)
-addi $sp, $sp, 16
+addi $sp, $sp, 20
 sw $v0, 0($t3)
 
 jr $ra
