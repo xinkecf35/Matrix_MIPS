@@ -12,7 +12,7 @@ userPrompt: .asciiz "Please enter a number from 1 to 40: "
 
 .eqv ROW_OFFSET_MULTIPLIER 320
 .eqv COLUMN_OFFSET_MULTIPLIER 4
-.eqv TERMINAL_REGION_START 0xFFFF6200
+.eqv TERMINAL_REGION_START 0xFFFF60C0
 .eqv RANDOM_ID 1
 
 .text 
@@ -106,7 +106,7 @@ beq $t0, 80, exitSelectNewColumns
 lb $t1, currentRow($t0)
 sltiu $t2, $t1, 64
 beqz $t1, checkRowArrayLoop # if value is zero, just loop
-beq $t2, 1, checkRowArrayLoop #if value is less than 40, just loop
+beq $t2, 1, checkRowArrayLoop #if value is less than 64, just loop
 #Reset appropriate columns
 sb $zero, currentRow($t0)
 sb $zero, enableArray($t0)
@@ -271,7 +271,6 @@ j enqueueColumnsLoop
 
 returnQueueSize:
 add $v0, $zero, $t1
-#maybe need to add one here?
 jr $ra
 
 
