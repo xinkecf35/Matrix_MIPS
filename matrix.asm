@@ -12,7 +12,7 @@ userPrompt: .asciiz "Please enter a number from 1 to 40: "
 
 .eqv ROW_OFFSET_MULTIPLIER 320
 .eqv COLUMN_OFFSET_MULTIPLIER 4
-.eqv TERMINAL_REGION_START 0xFFFF8000
+.eqv TERMINAL_REGION_START 0xFFFF6200
 .eqv RANDOM_ID 1
 
 .text 
@@ -104,7 +104,7 @@ checkRowArrayLoop:
 addi $t0, $t0, 1
 beq $t0, 80, exitSelectNewColumns
 lb $t1, currentRow($t0)
-sltiu $t2, $t1, 40
+sltiu $t2, $t1, 64
 beqz $t1, checkRowArrayLoop # if value is zero, just loop
 beq $t2, 1, checkRowArrayLoop #if value is less than 40, just loop
 #Reset appropriate columns
@@ -190,7 +190,7 @@ lw $t0, 0($sp)
 addi $sp, $sp, 20
 sw $v0, 0($t3) #stores word into address of terminal
 beq $t2, 250, exitUpdateColumn #if greenValue is 250, exit
-slti $t5, $t1, 40
+slti $t5, $t1, 64
 beqz $t5, exitUpdateColumn #if row reaches end, exit
 addi $t2, $t2, 10
 addi $t1, $t1, 1 
