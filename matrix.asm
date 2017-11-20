@@ -76,11 +76,58 @@ lb $a1, currentRow($a0) #get row from currentRow for column
 jal updateColumn
 addi $s2, $s2, 1
 j refreshColumnsLoop
-#Terminate Program
+#Terminate Program incase it goes too far
 addi $v0, $zero, 10
 syscall
 
 #Functions
+#Function to update row if row 40 is reached
+selectNewColumns:
+addi $t0, $zero, -1 #index of currentRow 
+checkRowArrayLoop:
+addi $t0, $t0, 1
+beq $t0, 80, exitSelectNewColumns
+lb $t1, currentRow($t0)
+sltiu $t2, $t1, 40
+beqz $t1, checkRowArrayLoop # if value is zero, just loop
+beq $t2, 1, checkRowArrayLoop #if value is less than 40, just loop
+#Reset appropriate columns
+sb $zero, currentRow($t0)
+sb $zero, enableArray($t0)
+#call random with range from 0 - 80
+addi $a0, $zero, RANDOM_ID
+addi $a0, $zero, 80
+addi $v0, $zero, 42
+syscall
+lb $t3, enableArray($a0)
+beqz $t3, newColumnSelect #if index at enableArray is zero, perform rest of the stuff
+#perserve
+addi $sp, $sp, -8
+sw $ra, 4($sp)
+sw $t0, 0($sp)
+jal collisionResolution
+#restore 
+lw $ra, 4($sp)
+lw $t0, 0($sp)
+addi $sp, $sp, 8
+#set a0 to empty index from collisionResolution
+add $a0, $zero, $v0 #to be consistent with above instructions
+newColumnSelect:
+add $t4, $zero, $a0 #t4 contains new index to update
+#call random with range from 0 - 255 per java.util.Random
+addi $a0, $zero, RANDOM_ID
+addi $a0, $zero, 255
+addi $v0, $zero, 42
+syscall
+addi $a0, $a0, 1 # now 1-255; inclusive
+sb $a0, enableArray($t4)
+j checkRowArrayLoop
+
+exitSelectNewColumns:
+jr $ra
+
+
+
 #Function to refresh individual columns
 # $a0 = column index
 # $a1 = current row for column
