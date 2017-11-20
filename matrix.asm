@@ -112,7 +112,7 @@ sb $zero, currentRow($t0)
 sb $zero, enableArray($t0)
 #call random with range from 0 - 80
 addi $a0, $zero, RANDOM_ID
-addi $a0, $zero, 80
+addi $a1, $zero, 80
 addi $v0, $zero, 42
 syscall
 lb $t3, enableArray($a0)
