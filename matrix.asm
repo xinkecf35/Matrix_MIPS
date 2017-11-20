@@ -68,12 +68,14 @@ rainLoop:
 add $a0, $zero, $s0
 jal identifyColumnsToRefresh
 add $s1, $zero, $v0 #number of items in updateQueue
-and $s0, $zero, $s0 #set index 
+and $s2, $zero, $s2 #set index 
 refreshColumnsLoop:
-lb $a0, updateQueue($s0) #dequeue a columm from updateQueue
+beq $s2, $s1, rainLoop
+lb $a0, updateQueue($s2) #dequeue a columm from updateQueue
 lb $a1, currentRow($a0) #get row from currentRow for column
 jal updateColumn
-
+addi $s2, $s2, 1
+j refreshColumnsLoop
 #Terminate Program
 addi $v0, $zero, 10
 syscall
@@ -85,6 +87,9 @@ syscall
 updateColumn:
 add $t0, $zero, $a0 # $t0 = column
 add $t1, $zero, $a1 # $t1 = row
+#update currentRow here
+addi $a1, $a1, 1 
+sb $a1, currentRow($a0)
 addi $t2, $zero, 0 #greenValue index
 rowLoop: 
 #Perserving $t0 and $t1
@@ -122,7 +127,8 @@ lw $t0, 0($sp)
 addi $sp, $sp, 20
 sw $v0, 0($t3) #stores word into address of terminal
 beq $t2, 250, exitUpdateColumn #if greenValue is 250, exit
-beq $t1, 39, exitUpdateColumn #if row reaches end, exit
+slti $t5, $t1, 40
+beqz $t5, exitUpdateColumn #if row reaches end, exit
 addi $t2, $t2, 10
 addi $t1, $t1, 1 
 j rowLoop
