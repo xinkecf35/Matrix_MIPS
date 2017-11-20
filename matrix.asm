@@ -25,8 +25,13 @@ addi $a0, $zero, RANDOM_ID
 addi $v0, $zero, 40 
 syscall
 #Prompt User for input
+la $a0, userPrompt
+addi $v0, $zero, 4
+syscall
+addi $v0, $zero, 5
+syscall
 #actually implement this 
-addi $v0, $zero, 1 #dummy input; DO NOT LEAVE THIS IN
+#addi $v0, $zero, 1 #dummy input; DO NOT LEAVE THIS IN
 
 add $t0, $zero, $v0 #moves user input into t0 for intial column selection
 #Select inital columns to be selected 
