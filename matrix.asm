@@ -132,7 +132,7 @@ newColumnSelect:
 add $t4, $zero, $a0 #t4 contains new index to update
 #call random with range from 0 - 255 per java.util.Random
 addi $a0, $zero, RANDOM_ID
-addi $a0, $zero, 255
+addi $a1, $zero, 255
 addi $v0, $zero, 42
 syscall
 addi $a0, $a0, 1 # now 1-255; inclusive
