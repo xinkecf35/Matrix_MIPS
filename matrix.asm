@@ -238,7 +238,7 @@ jr $ra
 collisionResolution:
 addi $v0, $a0, 1
 findOpenIndexLoop:
-beq $v0, 80, setIndexToZero
+beq $v0, 79, setIndexToZero
 lb $t1, enableArray($v0)
 beqz $t1, returnEmptyIndex
 addi $v0, $v0, 1
