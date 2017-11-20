@@ -63,8 +63,11 @@ addi $t0, $t0, -1 #decrement column needed index
 j initialColumnSelectLoop
 
 startDigitalRain:
-addi $s0, $zero, 1 #Using $s0 as global cycle count, start at 1
+addi $s0, $zero, 0 #Using $s0 as global cycle count, start at 1
 rainLoop:
+addi $s0, $s0, 1
+jal resetGlobalCycleCounter
+jal selectNewColumns
 add $a0, $zero, $s0
 jal identifyColumnsToRefresh
 add $s1, $zero, $v0 #number of items in updateQueue
@@ -81,6 +84,14 @@ addi $v0, $zero, 10
 syscall
 
 #Functions
+
+#function to reset s0 to 1 if becomes greater than 255
+resetGlobalCycleCounter:
+bne $s0, 256, returnFromReset
+addi $s0, $zero, 1
+returnFromReset:
+jr $ra
+
 #Function to update row if row 40 is reached
 selectNewColumns:
 addi $t0, $zero, -1 #index of currentRow 
