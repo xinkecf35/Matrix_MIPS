@@ -57,12 +57,12 @@ lw $t1, 4($sp)
 addi $sp, $sp, 8
 noCollision: 
 add $t2, $zero, $a0 # $t2 = index to enabled array
-#Call random with range from 0 to 127
+#Call random with range from 0 to 100
 addi $v0, $zero, 42
 addi $a0, $zero, RANDOM_ID
-addi $a1, $zero, 127 # range is now 0-127
+addi $a1, $zero, 100 # range is now 0-100
 syscall
-addi $a0, $a0, 1 #adds 1 to result so range is effectively 1-127, inclusive
+addi $a0, $a0, 1 #adds 1 to result so range is effectively 1-100, inclusive
 sb $a0, enableArray($t2) # stores value from above into enabled
 addi $t0, $t0, -1 #decrement column needed index
 j initialColumnSelectLoop
@@ -90,9 +90,9 @@ syscall
 
 #Functions
 
-#function to reset s0 to 1 if becomes greater than 127
+#function to reset s0 to 1 if becomes greater than 100
 resetGlobalCycleCounter:
-bne $s0, 128, returnFromReset
+bne $s0, 101, returnFromReset
 addi $s0, $zero, 1
 returnFromReset:
 jr $ra
@@ -130,12 +130,12 @@ addi $sp, $sp, 8
 add $a0, $zero, $v0 #to be consistent with above instructions
 newColumnSelect:
 add $t4, $zero, $a0 #t4 contains new index to update
-#call random with range from 0 - 127 per java.util.Random
+#call random with range from 0 - 100 per java.util.Random
 addi $a0, $zero, RANDOM_ID
-addi $a1, $zero, 127
+addi $a1, $zero, 100
 addi $v0, $zero, 42
 syscall
-addi $a0, $a0, 1 # now 1-127; inclusive
+addi $a0, $a0, 1 # now 1-100; inclusive
 sb $a0, enableArray($t4)
 j checkRowArrayLoop
 
