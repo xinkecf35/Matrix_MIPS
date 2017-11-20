@@ -26,7 +26,7 @@ addi $v0, $zero, 40
 syscall
 #Prompt User for input
 #actually implement this 
-addi $v0, $zero, 10 #dummy input; DO NOT LEAVE THIS IN
+addi $v0, $zero, 1 #dummy input; DO NOT LEAVE THIS IN
 
 add $t0, $zero, $v0 #moves user input into t0 for intial column selection
 #Select inital columns to be selected 
@@ -251,7 +251,7 @@ identifyColumnsToRefresh:
 and $t0, $zero, $t0 # index of enableArray
 and $t1, $zero, $t1 # index of updateQueue
 enqueueColumnsLoop:
-beq $t0, 40, returnQueueSize
+beq $t0, 80, returnQueueSize
 lb $t3, enableArray($t0)
 beqz $t3, incrementQueueLoop
 #if value is non-zero, determine whether to enqueue or not
