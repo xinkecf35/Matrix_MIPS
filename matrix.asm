@@ -12,7 +12,7 @@ userPrompt: .asciiz "Please enter a number from 1 to 40: "
 
 .eqv ROW_OFFSET_MULTIPLIER 320
 .eqv COLUMN_OFFSET_MULTIPLIER 4
-.eqv TERMINAL_REGION_START 0xFFFF6150
+.eqv TERMINAL_REGION_START 0xFFFF6200
 .eqv RANDOM_ID 1
 
 .text 
@@ -57,12 +57,12 @@ lw $t1, 4($sp)
 addi $sp, $sp, 8
 noCollision: 
 add $t2, $zero, $a0 # $t2 = index to enabled array
-#Call random with range from 0 to 150
+#Call random with range from 0 to 180
 addi $v0, $zero, 42
 addi $a0, $zero, RANDOM_ID
-addi $a1, $zero, 150 # range is now 0-150
+addi $a1, $zero, 180 # range is now 0-180
 syscall
-addi $a0, $a0, 1 #adds 1 to result so range is effectively 1-150, inclusive
+addi $a0, $a0, 1 #adds 1 to result so range is effectively 1-180, inclusive
 sb $a0, enableArray($t2) # stores value from above into enabled
 addi $t0, $t0, -1 #decrement column needed index
 j initialColumnSelectLoop
@@ -90,9 +90,9 @@ syscall
 
 #Functions
 
-#function to reset s0 to 1 if becomes greater than 150
+#function to reset s0 to 1 if becomes greater than 180
 resetGlobalCycleCounter:
-bne $s0, 151, returnFromReset
+bne $s0, 181, returnFromReset
 addi $s0, $zero, 1
 returnFromReset:
 jr $ra
@@ -130,12 +130,12 @@ addi $sp, $sp, 8
 add $a0, $zero, $v0 #to be consistent with above instructions
 newColumnSelect:
 add $t4, $zero, $a0 #t4 contains new index to update
-#call random with range from 0 - 150 per java.util.Random
+#call random with range from 0 - 180 per java.util.Random
 addi $a0, $zero, RANDOM_ID
-addi $a1, $zero, 150
+addi $a1, $zero, 180
 addi $v0, $zero, 42
 syscall
-addi $a0, $a0, 1 # now 1-150; inclusive
+addi $a0, $a0, 1 # now 1-180; inclusive
 sb $a0, enableArray($t4)
 j checkRowArrayLoop
 
@@ -238,10 +238,10 @@ jr $ra
 collisionResolution:
 addi $v0, $a0, 1
 findOpenIndexLoop:
-beq $v0, 79, setIndexToZero
 lb $t1, enableArray($v0)
 beqz $t1, returnEmptyIndex
 addi $v0, $v0, 1
+beq $v0, 80, setIndexToZero
 j findOpenIndexLoop
 setIndexToZero:
 and $v0, $v0, $zero 
