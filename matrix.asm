@@ -97,9 +97,9 @@ checkRowArrayLoop:
 addi $t0, $t0, 1
 beq $t0, 80, exitSelectNewColumns
 lb $t1, currentRow($t0)
-sltiu $t2, $t1, 64
+sltiu $t2, $t1, 65
 beqz $t1, checkRowArrayLoop # if value is zero, just loop
-beq $t2, 1, checkRowArrayLoop #if value is less than 64, just loop
+beq $t2, 1, checkRowArrayLoop #if value is less than 65, just loop
 #Reset appropriate columns
 sb $zero, currentRow($t0)
 sb $zero, enableArray($t0)
@@ -183,7 +183,7 @@ lw $t0, 0($sp)
 addi $sp, $sp, 20
 sw $v0, 0($t3) #stores word into address of terminal
 beq $t2, 250, exitUpdateColumn #if greenValue is 250, exit
-slti $t5, $t1, 64
+slti $t5, $t1, 65
 beqz $t5, exitUpdateColumn #if row reaches end, exit
 addi $t2, $t2, 10
 addi $t1, $t1, 1 
