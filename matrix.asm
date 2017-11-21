@@ -8,20 +8,13 @@ updateQueue: .space 40 #queue to manage columns to send
 #Output Strings
 userPrompt: .asciiz "Please enter a number from 1 to 40: "
 
-#Useful macros
-
-.eqv ROW_OFFSET_MULTIPLIER 320
-.eqv COLUMN_OFFSET_MULTIPLIER 4
-.eqv TERMINAL_REGION_START 0xFFFF60C0
-.eqv RANDOM_ID 1
-
 .text 
 #set random id and Seed
 #grab time
 addi $v0, $zero, 30
 syscall
 add $a1, $zero, $a0 #set low order half of time to be seed
-addi $a0, $zero, RANDOM_ID
+addi $a0, $zero, 1
 addi $v0, $zero, 40 
 syscall
 #Prompt User for input
@@ -40,7 +33,7 @@ initialColumnSelectLoop:
 beqz $t0, startDigitalRain # once zero, branch out
 #set random id and random with range syscall
 addi $v0, $zero, 42
-addi $a0, $zero, RANDOM_ID
+addi $a0, $zero, 1
 addi $a1, $zero, 80 #intial range is 0-80
 syscall
 lb $t1, enableArray($a0) #Use returned value as offset to load byte
@@ -59,7 +52,7 @@ noCollision:
 add $t2, $zero, $a0 # $t2 = index to enabled array
 #Call random with range from 0 to 180
 addi $v0, $zero, 42
-addi $a0, $zero, RANDOM_ID
+addi $a0, $zero, 1
 addi $a1, $zero, 180 # range is now 0-180
 syscall
 addi $a0, $a0, 1 #adds 1 to result so range is effectively 1-180, inclusive
@@ -111,7 +104,7 @@ beq $t2, 1, checkRowArrayLoop #if value is less than 64, just loop
 sb $zero, currentRow($t0)
 sb $zero, enableArray($t0)
 #call random with range from 0 - 80
-addi $a0, $zero, RANDOM_ID
+addi $a0, $zero, 1
 addi $a1, $zero, 80
 addi $v0, $zero, 42
 syscall
@@ -131,7 +124,7 @@ add $a0, $zero, $v0 #to be consistent with above instructions
 newColumnSelect:
 add $t4, $zero, $a0 #t4 contains new index to update
 #call random with range from 0 - 180 per java.util.Random
-addi $a0, $zero, RANDOM_ID
+addi $a0, $zero, 1
 addi $a1, $zero, 180
 addi $v0, $zero, 42
 syscall
@@ -203,7 +196,7 @@ jr $ra
 createWordForConsole:
 add $t0, $zero, $a0 # t0 contains current green value
 #generates a random value now
-add $a0, $zero, RANDOM_ID
+add $a0, $zero, 1
 add $a1, $zero, 94
 addi $v0, $zero, 42
 syscall
@@ -219,10 +212,10 @@ jr $ra
 # $a1 = row
 # #v0 = address of column and region
 fetchColumnAddress:
-add $v0, $zero, TERMINAL_REGION_START #Start of terminal memory region in $t0
+add $v0, $zero, 0xFFFF60C0 #Start of terminal memory region in $t0
 #Calculate offset to row
-addi $t0, $zero, COLUMN_OFFSET_MULTIPLIER # t1 = column constant; 4
-addi $t1, $zero, ROW_OFFSET_MULTIPLIER # $t0 = row calculation constant; 320
+addi $t0, $zero, 4 # t1 = column constant; 4
+addi $t1, $zero, 320 # $t0 = row calculation constant; 320
 multu $a0, $t0 #column index * column_multiplier
 mflo $t2 # t2 = calculated column offset
 multu $a1, $t1 # row index * row_multiplier
